@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-  <title>Storm Compatibility - GearPump 0.7.0 Documentation</title>
+  <title>Storm Compatibility - Gearpump 0.7.6 Documentation</title>
   
 
   
@@ -31,11 +31,17 @@
   <div class="navbar navbar-inverse navbar-fixed-top" id="topbar">
     <div class="container">
       <div class="navbar-header">
-        <a class="navbar-brand" href="http://gearpump.io">GearPump
-          <span class="label label-primary" style="font-size: .6em">0.7.0</span>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://gearpump.io">Gearpump
+          <span class="label label-primary" style="font-size: .6em">0.7.6</span>
         </a>
       </div>
-      <div class="collapse navbar-collapse">
+      <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <li><a href="index.html">Overview</a></li>
 
@@ -57,16 +63,18 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Deploying<b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li class="dropdown-header">Deployment</li>
-              <li><a href="deployment-docker.html">Docker</a><li>
-              <li><a href="deployment-local.html">Local</a><li>
-              <li><a href="deployment-standalone.html">Standalone</a></li>
-              <li><a href="deployment-yarn.html">YARN</a></li>
+              <li><a href="deployment-local.html">Local Mode</a><li>
+              <li><a href="deployment-standalone.html">Standalone Mode</a></li>
+              <li><a href="deployment-yarn.html">YARN Mode</a></li>
+              <li><a href="deployment-docker.html">Docker Mode</a><li>
               <li class="divider"></li>
+              <li><a href="deployment-ui-authentication.html">UI Authentication</a></li>
               <li><a href="deployment-ha.html">High Availability</a></li>
               <li><a href="deployment-msg-delivery.html">Reliable Message Delivery</a></li>
               <li><a href="deployment-configuration.html">Configuration</a></li>
+              <li><a href="deployment-resource-isolation.html">Resource Isolation</a></li>
               <li class="divider"></li>
-              <li><a href="deployment-security.html">Security</a></li>
+              <li><a href="deployment-security.html">YARN Security Guide</a></li>
             </ul>
           </li>
 
@@ -114,6 +122,142 @@
    <p>Gearpump provides <strong>binary compatibility</strong> for Apache Storm applications. That is to say, users could easily grab an existing Storm jar and run it 
 on Gearpump. This documentation illustrates Gearpump&#8217;s comapatibility with Storm.</p>
 
+<h2 id="what-storm-features-are-supported-on-gearpump">What Storm features are supported on Gearpump</h2>
+
+<h3 id="storm-09x">Storm 0.9.x</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>basic topology</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>DRPC</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>multi-lang</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-kafka</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>Trident</td>
+      <td>no</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="storm-010x">Storm 0.10.x</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>basic topology</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>DRPC</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>multi-lang</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-kafka</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-hdfs</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-hbase</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-hive</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-jdbc</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-redis</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>flux</td>
+      <td>yes</td>
+    </tr>
+    <tr>
+      <td>storm-eventhubs</td>
+      <td>not verfied</td>
+    </tr>
+    <tr>
+      <td>Trident</td>
+      <td>no</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="at-least-once-support">At Least Once support</h3>
+
+<p>With Ackers enabled, there are two kinds of At Least Once support in both Storm 0.9.x and Storm 0.10.x.</p>
+
+<ol>
+  <li>spout will replay messages on message loss as long as spout is alive</li>
+  <li>If <code>KafkaSpout</code> is used, messages could be replayed from Kafka even if the spout crashes.</li>
+</ol>
+
+<p>Gearpump supports the second for both Storm versions.</p>
+
+<h3 id="security-support">Security support</h3>
+
+<p>Storm 0.10.x adds security support for following connectors</p>
+
+<ul>
+  <li><a href="https://github.com/apache/storm/blob/0.10.x-branch/external/storm-hdfs/README.md">storm-hdfs</a></li>
+  <li><a href="https://github.com/apache/storm/blob/0.10.x-branch/external/storm-hive/README.md">storm-hive</a></li>
+  <li><a href="https://github.com/apache/storm/blob/0.10.x-branch/external/storm-hbase/README.md">storm-hbase</a></li>
+</ul>
+
+<p>That means users could access kerberos enabled HDFS, Hive and HBase with these connectors. Generally, Storm provides two approaches (please refer to above links for more information)</p>
+
+<ol>
+  <li>configure nimbus to automatically get delegation tokens on behalf of the topology submitter user</li>
+  <li>kerberos keytabs are already distributed on worker hosts; users configure keytab path and principal</li>
+</ol>
+
+<p>Gearpump supports the second approach and users needs to add classpath of HDFS/Hive/HBase to <code>gearpump.executor.extraClasspath</code> in <code>gear.conf</code> on each node. For example,</p>
+
+<div class="highlight"><pre><code>  ###################
+  ### Executor argument configuration
+  ### Executor JVM can contains multiple tasks
+  ###################
+  executor {
+    vmargs = "-server -Xms512M -Xmx1024M -Xss1M -XX:+HeapDumpOnOutOfMemoryError -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseParNewGC -XX:NewRatio=3  -Djava.rmi.server.hostname=localhost"
+    extraClasspath = "/etc/hadoop/conf"
+  }
+</code></pre></div>
+
 <h2 id="how-to-run-a-storm-application-on-gearpump">How to run a Storm application on Gearpump</h2>
 
 <p>This section shows how to run an existing Storm jar in a local Gearpump cluster.</p>
@@ -122,25 +266,46 @@ on Gearpump. This documentation illustrates Gearpump&#8217;s comapatibility with
   <li>
     <p>launch a local cluster</p>
 
-    <div class="highlight"><pre><code>./target/pack/bin/local
+    <div class="highlight"><pre><code>bin/local
 </code></pre></div>
   </li>
   <li>
-    <p>submit a topology from storm-starter. 
-<code>
-bin/storm -verbose -config storm.yaml -jar storm-starter-${STORM_VERSION}.jar storm.starter.ExclamationTopology exclamation 
-</code></p>
+    <p>start a Gearpump Nimbus server</p>
+
+    <p>Users need server&#8217;s address(<code>nimbus.host</code> and <code>nimbus.thrift.port</code>) to submit topologies later. The address is written to a yaml config file set with <code>-output</code> option. 
+Users can provide an existing config file where only the address will be overwritten. If not provided, a new file <code>app.yaml</code> is created with the config.</p>
+
+    <div class="highlight"><pre><code>bin/storm nimbus -output [conf &lt;custom yaml config&gt;]
+</code></pre></div>
+  </li>
+  <li>
+    <p>submit Storm applications</p>
+
+    <p>Users can either submit Storm applications through command line or UI.</p>
+
+    <p>a. submit Storm applications through command line</p>
+
+    <p><code>
+  bin/storm app -verbose -config app.yaml -jar storm-starter-${STORM_VERSION}.jar storm.starter.ExclamationTopology exclamation 
+ </code></p>
 
     <p>Users are able to configure their applications through following options</p>
 
-    <ul>
-      <li><code>jar</code> - set the path of a storm application jar</li>
-      <li><code>config</code> - submit a customized storm configuration file</li>
-    </ul>
+    <div class="highlight"><pre><code>* `jar` - set the path of a Storm application jar
+* `config` - submit the custom configuration file generated when launching Nimbus
+</code></pre></div>
 
-    <p>That&#8217;s it. Check the dashboard and you should see data flowing through your topology.</p>
+    <p>b. submit Storm application through UI</p>
 
-    <p><em>Note that submission from UI is not supported yet</em>.</p>
+    <ol>
+      <li>Click on the &#8220;Create&#8221; button on the applications page on UI.</li>
+      <li>Click on the &#8220;Submit Storm Application&#8221; item in the pull down menu.</li>
+      <li>In the popup console, upload the Storm application jar and the configuration file generated when launching Nimbus,
+and fill in <code>storm.starter.ExclamationTopology exclamation</code> as arguments.</li>
+      <li>Click on the &#8220;Submit&#8221; button</li>
+    </ol>
+
+    <p>Either way, check the dashboard and you should see data flowing through your topology.</p>
   </li>
 </ol>
 
@@ -173,13 +338,16 @@ bin/storm -verbose -config storm.yaml -jar storm-starter-${STORM_VERSION}.jar st
 
 <p>Storm ackers are dropped since Gearpump has a different mechanism of message tracking and flow control.</p>
 
+<h3 id="task-execution">Task execution</h3>
+
+<p>Each Storm task is executed by a dedicated thread while all Gearpump tasks of an executor share a thread pool. Generally, we can achieve better performance with a shared thread pool. It&#8217;s possible, however, some tasks block and take up all the threads. In that case, we can 
+fall back to the Storm way by setting <code>gearpump.task-dispatcher</code> to <code>"gaerpump.single-thread-dispatcher"</code> in <code>gear.conf</code>.</p>
+
 <h3 id="message-tracking">Message tracking</h3>
 
 <p>Storm tracks the lineage of each message with ackers to guarantee at-least-once message delivery. Failed messages are re-sent from spout.</p>
 
 <p>Gearpump <a href="gearpump-internals.html#how-do-we-detect-message-loss">tracks messages between a sender and receiver in an efficient way</a>. Message loss causes the whole application to replay from the <a href="gearpump-internals.html#application-clock-and-global-clock-service">minimum timestamp of all pending messages in the system</a>.</p>
-
-<p><em>Note that ack from bolt is a no-op while fail throws an exception.</em></p>
 
 <h3 id="flow-control">Flow control</h3>
 
@@ -191,7 +359,7 @@ bin/storm -verbose -config storm.yaml -jar storm-starter-${STORM_VERSION}.jar st
 
 <p>All Storm configurations are respected with the following priority order</p>
 
-<div class="highlight"><pre><code>defaults.yaml &lt; storm.yaml &lt; application config &lt; component config &lt; custom user config
+<div class="highlight"><pre><code>defaults.yaml &lt; custom file config &lt; application config &lt; component config
 </code></pre></div>
 
 <p>where</p>
@@ -199,14 +367,60 @@ bin/storm -verbose -config storm.yaml -jar storm-starter-${STORM_VERSION}.jar st
 <ul>
   <li>application config is submit from Storm application along with the topology</li>
   <li>component config is set in spout / bolt with <code>getComponentConfiguration</code></li>
-  <li>custom user config is specified with the <code>-config</code> option when submitting Storm application from command line</li>
+  <li>custom file config is specified with the <code>-config</code> option when submitting Storm application from command line or uploaded from UI</li>
 </ul>
 
-<h2 id="limitations">Limitations</h2>
+<h2 id="streamcql-support">StreamCQL Support</h2>
+
+<p><a href="https://github.com/HuaweiBigData/StreamCQL">StreamCQL</a> is a Continuous Query Language on RealTime Computation System open sourced by Huawei.
+Since StreamCQL already supports Storm, it&#8217;s straightforward to run StreamCQL over Gearpump.</p>
 
 <ol>
-  <li>Trident support is ongoing.</li>
+  <li>
+    <p>Install StreamCQL as in the official <a href="https://github.com/HuaweiBigData/StreamCQL#install-streamcql">README</a></p>
+  </li>
+  <li>
+    <p>Launch Gearpump Nimbus Server as before</p>
+  </li>
+  <li>
+    <p>Go to the installed stream-cql-binary, and change following settings in <code>conf/streaming-site.xml</code> with the output Nimbus configs in Step 2.</p>
+
+    <div class="highlight"><pre><code class="language-xml"> <span class="nt">&lt;property&gt;</span>
+   <span class="nt">&lt;name&gt;</span>streaming.storm.nimbus.host<span class="nt">&lt;/name&gt;</span>
+   <span class="nt">&lt;value&gt;</span>${nimbus.host}<span class="nt">&lt;/value&gt;</span>
+ <span class="nt">&lt;/property&gt;</span>
+ <span class="nt">&lt;property&gt;</span>
+   <span class="nt">&lt;name&gt;</span>streaming.storm.nimbus.port<span class="nt">&lt;/name&gt;</span>
+   <span class="nt">&lt;value&gt;</span>${nimbus.thrift.port}<span class="nt">&lt;/value&gt;</span>
+ <span class="nt">&lt;/property&gt;</span></code></pre></div>
+  </li>
+  <li>
+    <p>Open CQL client shell and execute a simple cql example</p>
+
+    <div class="highlight"><pre><code>bin/cql
+</code></pre></div>
+
+    <div class="highlight"><pre><code class="language-sql"><span class="n">Streaming</span><span class="o">&gt;</span> <span class="k">CREATE</span> <span class="k">INPUT</span> <span class="n">STREAM</span> <span class="n">s</span>
+    <span class="p">(</span><span class="n">id</span> <span class="nb">INT</span><span class="p">,</span> <span class="n">name</span> <span class="n">STRING</span><span class="p">,</span> <span class="k">type</span> <span class="nb">INT</span><span class="p">)</span>
+<span class="k">SOURCE</span> <span class="n">randomgen</span>
+    <span class="n">PROPERTIES</span> <span class="p">(</span> <span class="n">timeUnit</span> <span class="o">=</span> <span class="ss">&quot;SECONDS&quot;</span><span class="p">,</span> <span class="n">period</span> <span class="o">=</span> <span class="ss">&quot;1&quot;</span><span class="p">,</span>
+        <span class="n">eventNumPerperiod</span> <span class="o">=</span> <span class="ss">&quot;1&quot;</span><span class="p">,</span> <span class="n">isSchedule</span> <span class="o">=</span> <span class="ss">&quot;true&quot;</span> <span class="p">);</span>
+   
+<span class="k">CREATE</span> <span class="k">OUTPUT</span> <span class="n">STREAM</span> <span class="n">rs</span>
+    <span class="p">(</span><span class="k">type</span> <span class="nb">INT</span><span class="p">,</span> <span class="n">cc</span> <span class="nb">INT</span><span class="p">)</span>
+<span class="n">SINK</span> <span class="n">consoleOutput</span><span class="p">;</span>
+   
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">STREAM</span> <span class="n">rs</span> <span class="k">SELECT</span> <span class="k">type</span><span class="p">,</span> <span class="k">COUNT</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="k">as</span> <span class="n">cc</span>
+    <span class="k">FROM</span> <span class="n">s</span><span class="p">[</span><span class="n">RANGE</span> <span class="mi">20</span> <span class="n">SECONDS</span> <span class="n">BATCH</span><span class="p">]</span>
+    <span class="k">WHERE</span> <span class="n">id</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="k">type</span><span class="p">;</span>
+   
+<span class="n">SUBMIT</span> <span class="n">APPLICATION</span> <span class="n">example</span><span class="p">;</span></code></pre></div>
+  </li>
+  <li>
+    <p>Check the dashboard and you should see data flowing through a topology of 3 components</p>
+  </li>
 </ol>
+
 
 
   </div> <!-- /container -->
